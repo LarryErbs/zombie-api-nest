@@ -2,8 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ZombieModule } from './zombie/zombie.module';
-import { DatabaseModule } from './postgres/database.module';
-import { TypeOrmConfigService } from './postgres/database.provider';
+import { DatabaseModule } from './db/database.module';
+import { TypeOrmConfigService } from './db/database.provider';
+import { ItemModule } from './items/item.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { TypeOrmConfigService } from './postgres/database.provider';
       useClass: TypeOrmConfigService,
     }),
     ZombieModule,
+    ItemModule,
     DatabaseModule,
   ],
   controllers: [],

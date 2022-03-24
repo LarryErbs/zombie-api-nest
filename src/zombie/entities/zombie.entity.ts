@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import { ItemEntity } from 'src/items/entities/item.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToMany,
+  PrimaryColumn,
+} from 'typeorm';
 import { IZombie } from '../interfaces/zombie.interface';
 
 @Entity('zombie')
@@ -11,4 +18,7 @@ export class ZombieEntity implements IZombie {
 
   @CreateDateColumn()
   creationDate: string;
+
+  @ManyToMany(() => ItemEntity, (item) => item.zombies, { nullable: true })
+  items: ItemEntity[];
 }
