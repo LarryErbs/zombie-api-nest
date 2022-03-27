@@ -1,6 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemEntity } from 'src/items/entities/item.entity';
+import { hasMoreThatFiveItems } from 'src/items/helpers/item-helper';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateZombieDto } from './dto/create-zombie.dto';
 import { UpdateZombieDto } from './dto/update-zombie.dto';
@@ -24,7 +30,10 @@ export class ZombieService {
   }
 
   findAll(): Promise<ZombieEntity[]> {
-    return this.zombieRepository.find();
+    return this.zombieRepository
+      .createQueryBuilder('zombie')
+      .leftJoinAndSelect('zombie.items', 'items')
+      .getMany();
   }
 
   findOne(zombieId: number): Promise<ZombieEntity> {
@@ -40,15 +49,23 @@ export class ZombieService {
   }
 
   async addItem(zombieId: number, itemName: string): Promise<void> {
-    const zombie = await this.findOne(zombieId);
+    const zombie = await this.zombieRepository
+      .createQueryBuilder('zombie')
+      .where('zombie.id = :id', { id: zombieId })
+      .leftJoinAndSelect('zombie.items', 'items')
+      .getOne();
     if (!zombie) throw new NotFoundException('Zombie not found');
 
     const item = await this.itemRepository.findOneBy({
       name: itemName,
     });
+    zombie.items = [...(zombie.items || []), item];
+    if (hasMoreThatFiveItems(zombie.items)) {
+      throw new InternalServerErrorException(
+        'Zombie cannot have more than 5 items',
+      );
+    }
 
-    zombie.items.push(item);
-    // TODO
-    await this.update(zombie.id, zombie);
+    await this.zombieRepository.save(zombie);
   }
 }

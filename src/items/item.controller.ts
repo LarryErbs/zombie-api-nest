@@ -34,7 +34,7 @@ export class ItemController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: number): Promise<ItemEntity> {
     return this.itemService.findOne(id);
   }
 

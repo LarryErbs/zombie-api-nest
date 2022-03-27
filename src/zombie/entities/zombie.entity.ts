@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
   ManyToMany,
   PrimaryColumn,
 } from 'typeorm';
@@ -20,5 +21,6 @@ export class ZombieEntity implements IZombie {
   creationDate: string;
 
   @ManyToMany(() => ItemEntity, (item) => item.zombies, { nullable: true })
+  @JoinTable()
   items: ItemEntity[];
 }

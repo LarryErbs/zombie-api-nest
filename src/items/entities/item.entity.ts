@@ -1,5 +1,5 @@
 import { ZombieEntity } from 'src/zombie/entities/zombie.entity';
-import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class ItemEntity {
@@ -13,6 +13,5 @@ export class ItemEntity {
   value: number;
 
   @ManyToMany(() => ZombieEntity, (zombie) => zombie.items, { nullable: true })
-  @JoinTable()
   zombies: ZombieEntity[];
 }
